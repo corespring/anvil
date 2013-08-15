@@ -29,9 +29,13 @@ if [ "$source_anchor" == "$source_url" ]; then
 fi
 
 echo "done" >&2
+echo -n ">>>>>>>>>>>>>>>>>>>>>>>> !!!" >&2
+echo "$source_url" >&2
 echo -n "Preparing app for compilation... " >&2
 
 # fetching app
+
+
 case $source_url in
   *.json)
     manifest=$(mktemp -t manifest_XXXXX)

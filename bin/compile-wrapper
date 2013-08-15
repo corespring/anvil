@@ -19,6 +19,8 @@ trap on_exit EXIT
 
 stty -icanon -echo 2>/dev/null || echo -n ""
 
+echo "compile-wrapper: $1"
+
 compile_dir=$(bin/fetch $1)
 bin/compile $compile_dir
 bin/stow $compile_dir

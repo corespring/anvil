@@ -5,8 +5,8 @@ class Builder
   constructor: () ->
     @id         = uuid.v4()
     @request_id = @id
-    @spawner    = require("spawner").init()
-    @storage    = require("storage").init()
+    @spawner    = require("./spawner").init()
+    @storage    = require("./storage").init()
 
   build: (source, options, cb) ->
     ext = if options.type is "deb" then "deb" else "tgz"
@@ -38,7 +38,11 @@ class Builder
       env:       req.body.env
       keepalive: req.body.keepalive
       type:      req.body.type
-    require("builder").init().build req.body.source, options, (build, builder) ->
+
+    console.log "build_request body" , req.body
+    console.log "build_request source: #{req.body.source}"
+
+    require("./builder").init().build req.body.source, options, (build, builder) ->
       res.writeHead 200
         "Content-Type":      "text/plain"
         "Transfer-Encoding": "chunked"

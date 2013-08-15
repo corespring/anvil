@@ -88,7 +88,10 @@ app.post "/manifest/build", (req, res) ->
         builder.init().build_request req, res, logger
 
 app.post "/manifest/diff", (req, res) ->
-  manifest.init(JSON.parse(req.body.manifest)).missing_hashes (hashes) ->
+  console.log "received request for diffs..."
+  bodyManifest = JSON.parse(req.body.manifest)
+  console.info manifest
+  manifest.init(bodyManifest).missing_hashes (hashes) ->
     res.contentType "application/json"
     res.send JSON.stringify(hashes)
 
