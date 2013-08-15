@@ -2,6 +2,25 @@
 
 Generic build server
 
+
+## Setting up your own Anvil build server
+
+You'll need to set up the following env vars:
+* AWS_ACCESS
+* AWS_SECRET
+* S3_BUCKET
+
+There seem to be some issues getting the server to work correctly - the 'tweaks' branch has the fixes for this so far.
+
+### Running
+
+     foreman start
+
+### Setting server as host for heroku-anvil plugin
+
+     export ANVIL_HOST="http://localhost:5000"
+
+
 ## Installation
 
     $ heroku plugins:install https://github.com/ddollar/heroku-anvil
