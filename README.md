@@ -10,7 +10,7 @@ You'll need to set up the following env vars:
 * AWS_SECRET
 * S3_BUCKET
 
-There seem to be some issues getting the server to work correctly - the 'tweaks' branch has the fixes for this so far.
+On top of this you'll need to export `ANVIL_HOST` to point to this server.
 
 ### Running
 
