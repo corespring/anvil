@@ -1,16 +1,19 @@
 # anvil
 
-Generic build server
+Generic build server.
+
+This web app creates heroku slugs, similar to what the slug compiler does when you `git push heroku master`.
+
+Use this in conjunction with the [heroku-anvil](https://github.com/ddollar/heroku-anvil) plugin.
 
 
 ## Setting up your own Anvil build server
 
 You'll need to set up the following env vars:
-* AWS_ACCESS
-* AWS_SECRET
-* S3_BUCKET
-
-On top of this you'll need to export `ANVIL_HOST` to point to this server.
+* AWS_ACCESS - Amazon s3 key
+* AWS_SECRET - Amazon s3 secret
+* S3_BUCKET - Amazon s3 bucket
+* ANVIL_HOST - the url of the server hosting anvil
 
 ### OS
 
