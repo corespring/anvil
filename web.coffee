@@ -26,7 +26,7 @@ app = express.createServer(
   express.bodyParser())
 
 app.get "/", (req, res) ->
-  res.send "ok"
+  res.send "tweaks branch - ok"
 
 app.get "/heartbeat", (req, res) ->
   res.send "ok"
