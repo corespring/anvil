@@ -50,8 +50,13 @@ app.put "/cache/:id.tgz", (req, res) ->
   console.log "put /cache/:id.tgz..."
   console.log req.files
 
-  storage.create_stream "/cache/#{req.params.id}.tgz", fs.createReadStream(req.files.data.path), (err) ->
-    res.send("ok")
+  file_type = req.files.data["type"]
+  filesize = req.files.data.size
+  path = req.files.data.path
+  url = "/cache/#{req.params.id}.tgz"
+
+  storage.create_stream url, filesize, file_type, fs.createReadStream(path), (err) ->
+    if err? then res.status(400).send(err) else res.send "ok"
 
 app.get "/exit/:id", (req, res) ->
   storage.get "/exit/#{req.params.id}", (err, get) ->
