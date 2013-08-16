@@ -48,7 +48,6 @@ app.get "/cache/:id.tgz", (req, res) ->
 
 app.put "/cache/:id.tgz", (req, res) ->
   console.log "put /cache/:id.tgz..."
-  console.log req.files
 
   file_type = req.files.data["type"]
   filesize = req.files.data.size
@@ -102,12 +101,10 @@ app.post "/manifest/build", (req, res) ->
         builder.init().build_request req, res, logger
 
 app.post "/manifest/diff", (req, res) ->
-  console.log "received request for diffs..."
+  console.log "[web.coffee] received request for diffs..."
   bodyManifest = JSON.parse(req.body.manifest)
-  console.info manifest
   manifest.init(bodyManifest).missing_hashes (hashes) ->
     missing = JSON.stringify(hashes)
-    console.log "[web.coffee] /manifest/diff - hashes: #{missing}"
     res.contentType "application/json"
     res.send missing
 
