@@ -47,6 +47,9 @@ app.get "/cache/:id.tgz", (req, res) ->
     get.on "end",          -> res.end()
 
 app.put "/cache/:id.tgz", (req, res) ->
+  console.log "put /cache/:id.tgz..."
+  console.log req.files
+
   storage.create_stream "/cache/#{req.params.id}.tgz", fs.createReadStream(req.files.data.path), (err) ->
     res.send("ok")
 
@@ -67,8 +70,14 @@ app.post "/file/:hash", (req, res) ->
   log "api.file.post", hash:req.params.hash, (logger) ->
     storage.verify_hash req.files.data.path, req.params.hash, (err) ->
       return res.send(err, 403) if err
-      storage.create_stream "/hash/#{req.params.hash}", fs.createReadStream(req.files.data.path), (err) ->
-        res.send "ok"
+
+      file_type = req.files.data["type"]
+      filesize = req.files.data.size
+      path = req.files.data.path
+      url = "/hash/#{req.params.hash}"
+
+      storage.create_stream url, filesize, file_type, fs.createReadStream(path), (err) ->
+        if err? then res.status(400).send(err) else res.send "ok"
 
 app.post "/manifest", (req, res) ->
   manifest.init(JSON.parse(req.body.manifest)).save (err, manifest_url) ->
@@ -92,8 +101,10 @@ app.post "/manifest/diff", (req, res) ->
   bodyManifest = JSON.parse(req.body.manifest)
   console.info manifest
   manifest.init(bodyManifest).missing_hashes (hashes) ->
+    missing = JSON.stringify(hashes)
+    console.log "[web.coffee] /manifest/diff - hashes: #{missing}"
     res.contentType "application/json"
-    res.send JSON.stringify(hashes)
+    res.send missing
 
 app.get "/manifest/:id.json", (req, res) ->
   storage.get "/manifest/#{req.params.id}.json", (err, get) =>

@@ -12,6 +12,11 @@ You'll need to set up the following env vars:
 
 On top of this you'll need to export `ANVIL_HOST` to point to this server.
 
+### OS
+
+I've been trying to get this to run on OSX - and whilst its running alot of the buildpacks are
+optimized for Linux so things break.
+
 ### Running
 
      foreman start

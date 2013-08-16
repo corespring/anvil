@@ -25,7 +25,7 @@ class Manifest
 
   test_hash_exists: (h, cb) ->
     @storage.exists "/hash/#{h}", (err, exists) ->
-      cb(null,exists)
+      cb(null,{exists: exists, hash: h})
       null
     null
 
@@ -43,8 +43,11 @@ class Manifest
       missing = []
 
       console.log "received results : #{results}"
-      for hash, exists of results
-        missing.push(hash) unless exists
+      for r in results
+        console.log "-----------"
+        console.log r
+        console.log "-----------"
+        missing.push(r.hash) unless r.exists
       cb missing
 
   test_datastore_presence: (hash, cb) ->

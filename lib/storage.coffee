@@ -25,15 +25,24 @@ class Storage
 
   exists: (filename, cb) ->
     @knox.headFile filename, (err, res) ->
-      cb err, (res.statusCode != 404)
+      file_exists = if res then res.statusCode == 200 else false
+      cb err, file_exists
 
   create: (filename, data, options, cb) ->
     put = @knox.put filename, options
     put.on "response", (res) -> cb null
     put.end data
 
-  create_stream: (filename, stream, cb) ->
-    @knox.putStream stream, filename, (err, res) ->
+  create_stream: (filename, filesize, file_type, stream, cb) ->
+
+    console.log "[Storage] create_stream: #{filename}, size: #{filesize}, type: #{file_type}"
+
+    headers = {
+      'Content-Length': filesize,
+      'Content-Type': file_type
+    }
+
+    @knox.putStream stream, filename, headers, (err, res) ->
       cb null
 
   verify_hash: (filename, hash, cb) ->

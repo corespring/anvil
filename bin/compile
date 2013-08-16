@@ -38,16 +38,24 @@ if [ ! -d $compile_dir ]; then
   error "Aborting compilation"
 fi
 
+echo "[bin/compile] --> compile_dir : $compile_dir"
+
 # get root dir
 root_dir=$(pwd)
+echo "[bin/compile] --> root_dir : $root_dir"
+
 
 # create a cache dir
 cache_dir=$(mktemp -t cache_XXXXX)
+
+echo "[bin/compile] --> cache_dir : $cache_dir"
 rm -rf $cache_dir
 mkdir -p $cache_dir
 
 # fetch buildpack
 cd $compile_dir
+
+
 BUILDPACK_URL=${BUILDPACK_URL:-https://buildkits.herokuapp.com/buildkit/default.tgz}
 BUILDPACK_ANCHOR=${BUILDPACK_URL#*#}
 BUILDPACK_URL=${BUILDPACK_URL%%#*}
@@ -57,6 +65,8 @@ fi
 echo -n "Fetching buildpack... "
 buildpack=$(mktemp -t buildpack_XXXXX)
 rm -rf $buildpack; mkdir -p $buildpack;
+echo "[bin/compile] --> buildpack : $buildpack"
+
 case $BUILDPACK_URL in
   *.json)
     buildpack_manifest=$(mktemp -t buildpack_manifest_XXXXX)
@@ -98,6 +108,9 @@ buildpack_name=$($buildpack/bin/detect "$compile_dir") \
   && echo "done, ${buildpack_name}" \
   || error "failed"
 
+
+echo "[bin/compile] --> CACHE_URL : $CACHE_URL"
+
 # fetch cache
 if [ "$CACHE_URL" != "" ]; then
   echo -n "Fetching cache... "
@@ -114,6 +127,9 @@ profiled_scan_old=$(scan_profiled)
 # compile
 echo "Compiling app..."
 cd $compile_dir
+
+echo "[bin/compile] --> calling compile..."
+echo "[bin/compile] --> $buildpack/bin/compile $compile_dir $cache_dir"
 
 $buildpack/bin/compile $compile_dir $cache_dir 2>&1 | reformat
 
@@ -144,7 +160,7 @@ fi
 
 # put cache
 if [ "$CACHE_URL" != "" ]; then
-  echo -n "Putting cache... "
+  echo -n "[bin/compile] Putting cache... "
   cd $cache_dir
   tar czf $cache . >/dev/null 2>&1
   cd .
