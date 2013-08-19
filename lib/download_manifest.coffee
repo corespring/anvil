@@ -119,7 +119,7 @@ module.exports.execute = (args) ->
       q = async.queue( (task, cb) ->
           console.log ">> Run task : #{task.name}"
           prepare_file( task.name, task.manifest, task.base_dir, cb)
-      , 10)
+      , 50)
 
       q.push task_subset, (err) ->
         console.log "batch add handler"
