@@ -20,10 +20,9 @@ prepare_file = (name, file_manifest, dir, task_cb) ->
   filename = "#{dir}/#{name}"
   mkdirp path.dirname(filename), =>
     fetch_url "#{process.env.ANVIL_HOST}/file/#{file_manifest["hash"]}", filename, (err) ->
-      task_cb err, true
-      #fs.chmod filename, file_manifest.mode, (err) ->
-      #    fs.utimes filename, file_manifest.mtime, file_manifest.mtime, (err) ->
-      #      task_cb err, true
+      fs.chmod filename, file_manifest.mode, (err) ->
+        fs.utimes filename, file_manifest.mtime, file_manifest.mtime, (err) ->
+          task_cb err, true
 
 
 datastore_hash_fetchers = (manifest, dir) ->
@@ -115,7 +114,7 @@ module.exports.execute = (args) ->
 
       console.log "prep_functions #{tasks.length}"
 
-      task_subset = tasks[1..3]
+      task_subset = tasks[1..20]
 
       q = async.queue( (task, cb) ->
           console.log ">> Run task : #{task.name}"
