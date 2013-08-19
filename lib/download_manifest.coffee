@@ -122,15 +122,12 @@ module.exports.execute = (args) ->
 
       console.log "prep_functions #{tasks.length}"
 
-      task_subset = tasks[1..500]
+      task_subset = tasks #[1..500]
 
       q = async.queue( (task, cb) ->
-          console.log ">> Run task : #{task.name}"
-          onFilePrepped = (err, isSuccess) ->
-            link_file( task.name, task.manifest, task.base_dir, cb)
-
+          console.log ">> dl + link: #{task.name}"
+          onFilePrepped = (err, isSuccess) -> link_file( task.name, task.manifest, task.base_dir, cb)
           prepare_file( task.name, task.manifest, task.base_dir, onFilePrepped)
-          #link_file( task.name, task.manifest, task.base_dir, cb)
       , 50)
 
       q.push task_subset
