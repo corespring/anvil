@@ -60,7 +60,6 @@ fetch_url = (url, filename, cb) ->
     catch e
       console.log e
       console.trace
-    finally
       cb "Error creating writesStream #{filename}"
 
   writeChunk = (f, c) ->
@@ -69,7 +68,6 @@ fetch_url = (url, filename, cb) ->
     catch e
       console.log e
       console.trace
-    finally
       cb "Error writing chunk #{filename}"
 
   fileEnd = (f) ->
@@ -78,7 +76,6 @@ fetch_url = (url, filename, cb) ->
     catch e
       console.log e
       console.trace e
-    finally
       cb "Error calling end() #{filename}"
 
   file    = createStream filename
