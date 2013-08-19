@@ -18,7 +18,8 @@ program
 
 prepare_file = (name, file_manifest, dir) ->
 
-  acync_fn = (async_cb) ->
+  acync_fn = (task, async_cb) ->
+    console.log task
     filename = "#{dir}/#{name}"
     mkdirp path.dirname(filename), =>
       fetch_url "#{process.env.ANVIL_HOST}/file/#{file_manifest["hash"]}", filename, (err) ->
@@ -120,11 +121,16 @@ module.exports.execute = (args) ->
 
       console.log "prep_functions #{prep_functions.length}"
 
-      run_functions = prep_functions[1..10]
+      run_functions = prep_functions[1..3]
 
-      async.parallel run_functions, (err, results) ->
-        if err? then console.log err
-        console.log results
+      q = async.queue(run_functions, 10)
+
+      q.drain = ->
+        console.log('all items have been processed')
+
+      #async.parallelLimit run_functions, 10, (err, results) ->
+      #  if err? then console.log err
+      #  console.log results
       ###
       async.parallelLimit datastore_hash_fetchers(manifest, program.args[1]), 10, (err, results) ->
         if err?
