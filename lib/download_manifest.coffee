@@ -20,7 +20,6 @@ datastore_hash_fetchers = (manifest, dir) ->
   for name, file_manifest of manifest when file_manifest.hash
     do (name, file_manifest) =>
       fetchers[file_manifest.hash] = (async_cb) =>
-        console.log "hash fetcher for : #{name}"
         filename = "#{dir}/#{name}"
         mkdirp path.dirname(filename), =>
           fetch_url "#{process.env.ANVIL_HOST}/file/#{file_manifest["hash"]}", filename, (err) ->
@@ -35,9 +34,6 @@ datastore_link_fetchers = (manifest, dir) ->
   for name, file_manifest of manifest when file_manifest.link
     do (name, file_manifest) =>
       fetchers[file_manifest.link] = (async_cb) =>
-
-        "link fetcher for: #{name}"
-
         filename = "#{dir}/#{name}"
         mkdirp path.dirname(filename), =>
           fs.symlink "#{dir}/#{file_manifest.link}", filename, ->
@@ -55,15 +51,29 @@ fetch_url = (url, filename, cb) ->
     finally
       cb "Error creating writesStream #{filename}"
 
+  writeChunk = (f, c) ->
+    try
+      f.write c
+    catch e
+      console.trace e
+    finally
+      cb "Error writing chunk #{filename}"
+
+  fileEnd = (f) ->
+    try
+      f.end()
+    catch e
+      console.trace e
+    finally
+      cb "Error calling end() #{filename}"
+
   file    = createStream filename
   options = require("url").parse(url)
   client  = if options.protocol is "https:" then https else http
   get     = client.request options, (res) ->
-    res.on "data",  (chunk) ->
-      console.log "#{filename} [fetch_url] data received - write"
-      file.write chunk
+    res.on "data",  (chunk) -> writeChunk file, chunk
     res.on "end", ->
-      file.end()
+      fileEnd(file)
       cb null
   get.on "error", (err) ->
     console.log "error fetching #{url}: #{err}, retrying"
