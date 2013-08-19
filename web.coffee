@@ -65,11 +65,15 @@ app.get "/exit/:id", (req, res) ->
 app.get "/file/:hash", (req, res) ->
   log "api.file.get", hash:req.params.hash, (logger) ->
     storage.get "/hash/#{req.params.hash}", (err, get) ->
-      sc = if get? then get.statusCode else 400
-      res.writeHead sc,
-        "Content-Length": get.headers["content-length"]
-      get.on "data", (chunk) -> res.write chunk
-      get.on "end",          -> logger.finish(); res.end()
+
+      if(err)
+        res.status(400).send(err)
+      else
+        sc = if get? then get.statusCode else 400
+        res.writeHead sc,
+          "Content-Length": get.headers["content-length"]
+        get.on "data", (chunk) -> res.write chunk
+        get.on "end",          -> logger.finish(); res.end()
 
 app.post "/file/:hash", (req, res) ->
   log "api.file.post", hash:req.params.hash, (logger) ->
