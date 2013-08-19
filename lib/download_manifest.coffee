@@ -61,7 +61,7 @@ fetch_url = (url, filename, cb) ->
     catch e
       console.log e
     finally
-      cb "Error creating writesStream #{filename} #{e}"
+      cb "Error creating writesStream #{filename}"
 
   file    = createStream filename
   options = require("url").parse(url)
