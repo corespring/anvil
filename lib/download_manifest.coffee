@@ -18,7 +18,7 @@ program
 
 prepare_file = (name, file_manifest, dir) ->
 
-  acync_fn = (async_cb) =>
+  acync_fn = (async_cb) ->
     filename = "#{dir}/#{name}"
     mkdirp path.dirname(filename), =>
       fetch_url "#{process.env.ANVIL_HOST}/file/#{file_manifest["hash"]}", filename, (err) ->
