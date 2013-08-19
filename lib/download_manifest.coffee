@@ -57,6 +57,13 @@ fetch_url = (url, filename, cb) ->
 
 module.exports.execute = (args) ->
   program.parse(args)
+
+  console.log "[download manifest] execute"
+
+  console.log "[download manifest] args: #{args}"
+  file = program.args[0]
+  console.log "[download manifest] read file: #{file}"
+
   fs.readFile program.args[0], (err, data) ->
     manifest = JSON.parse(data)
     mkdirp program.args[1]
