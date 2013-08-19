@@ -16,17 +16,13 @@ program
   .usage('[options] <manifest> <target>')
 
 
-prepare_file = (name, file_manifest, dir) ->
-
-  acync_fn = (task, async_cb) ->
-    console.log task
-    filename = "#{dir}/#{name}"
-    mkdirp path.dirname(filename), =>
-      fetch_url "#{process.env.ANVIL_HOST}/file/#{file_manifest["hash"]}", filename, (err) ->
-        fs.chmod filename, file_manifest.mode, (err) ->
-            fs.utimes filename, file_manifest.mtime, file_manifest.mtime, (err) ->
-              async_cb err, true
-  acync_fn
+prepare_file = (name, file_manifest, dir, cb) ->
+  filename = "#{dir}/#{name}"
+  mkdirp path.dirname(filename), =>
+    fetch_url "#{process.env.ANVIL_HOST}/file/#{file_manifest["hash"]}", filename, (err) ->
+      fs.chmod filename, file_manifest.mode, (err) ->
+          fs.utimes filename, file_manifest.mtime, file_manifest.mtime, (err) ->
+            cb err, true
 
 
 datastore_hash_fetchers = (manifest, dir) ->
@@ -124,8 +120,8 @@ module.exports.execute = (args) ->
       task_subset = tasks[1..3]
 
       q = async.queue( (task, cb) ->
-          console.log "task : #{task.name}"
-          cb()
+          console.log ">> Run task : #{task.name}"
+          prepare_file( task.name, task.manifest, task.base_dir, cb)
       , 10)
 
       q.push task_subset, (err) ->
