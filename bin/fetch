@@ -42,7 +42,7 @@ case $source_url in
     curl -f -Ls $source_url -o $manifest
 
     echo -n "Running: download_manifest: $manifest, $compile_dir" >&2
-    $root_dir/bin/download_manifest $manifest $compile_dir >/dev/null # .download_manifest.log
+    $root_dir/bin/download_manifest $manifest $compile_dir > .download_manifest.log
     ;;
   *.git)
     git clone "$source_url" "$compile_dir" --recursive >/dev/null 2>/dev/null
