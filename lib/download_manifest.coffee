@@ -24,13 +24,10 @@ datastore_hash_fetchers = (manifest, dir) ->
         filename = "#{dir}/#{name}"
         mkdirp path.dirname(filename), =>
           fetch_url "#{process.env.ANVIL_HOST}/file/#{file_manifest["hash"]}", filename, (err) ->
-            console.log "#{filename} file fetched - chmod"
             async_cb(err) if err?
             fs.chmod filename, file_manifest.mode, (err) ->
               async_cb(err) if err?
-              console.log "#{filename} file fetched - utimes"
               fs.utimes filename, file_manifest.mtime, file_manifest.mtime, (err) ->
-                console.log "#{filename} utimes done"
                 async_cb err, true
 
 datastore_link_fetchers = (manifest, dir) ->
@@ -41,16 +38,12 @@ datastore_link_fetchers = (manifest, dir) ->
 
         "link fetcher for: #{name}"
 
-        console.log "linking", name, file_manifest
         filename = "#{dir}/#{name}"
         mkdirp path.dirname(filename), =>
-          console.log "link", filename, file_manifest.link
           fs.symlink "#{dir}/#{file_manifest.link}", filename, ->
-
-            console.log "#{name} sym link created"
             fs.chmod filename, file_manifest.mode, (err) ->
               console.log "#{name} chmod completed"
-              async_cb null, true
+              async_cb err, true
 
 fetch_url = (url, filename, cb) ->
   console.log "#{filename} -> create write stream"
