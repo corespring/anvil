@@ -46,7 +46,6 @@ datastore_link_fetchers = (manifest, dir) ->
               async_cb err, true
 
 fetch_url = (url, filename, cb) ->
-  console.log "#{filename} -> create write stream"
 
   createStream =  ->
     try
@@ -85,12 +84,9 @@ module.exports.execute = (args) ->
     manifest = JSON.parse(data)
     mkdirp program.args[1]
 
-    async.parallelLimit datastore_hash_fetchers(manifest, program.args[1]), 50, (err, results) ->
-      console.log "----------- run hash fetchers"
+    async.parallelLimit datastore_hash_fetchers(manifest, program.args[1]), 40, (err, results) ->
       if err?
         console.log(err)
       else
-        console.log "_________ run link fetchers"
-        async.parallelLimit datastore_link_fetchers(manifest, program.args[1]), 50, (err, results) ->
-
-          if err? then console.log err else console.log "complete"
+        async.parallelLimit datastore_link_fetchers(manifest, program.args[1]), 40, (err, results) ->
+          if err? then console.log(err) else console.log "complete"
