@@ -122,8 +122,8 @@ module.exports.execute = (args) ->
 
       run_functions = prep_functions[1..10]
 
-      async.parallelLimit run_functions, 50, (err, results) ->
-        console.log err
+      async.parallel run_functions, 50, (err, results) ->
+        if err? then console.log err
         console.log results
       ###
       async.parallelLimit datastore_hash_fetchers(manifest, program.args[1]), 10, (err, results) ->
