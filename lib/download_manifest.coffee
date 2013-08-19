@@ -25,39 +25,14 @@ prepare_file = (name, file_manifest, dir, task_cb) ->
           task_cb err, true
 
 link_file = (name, file_manifest, dir, task_cb) ->
-  filename = "#{dir}/#{name}"
-  mkdirp path.dirname(filename), =>
-    fs.symlink "#{dir}/#{file_manifest.link}", filename, ->
-      fs.chmod filename, file_manifest.mode, (err) ->
-        task_cb err, true
-
-
-
-datastore_hash_fetchers = (manifest, dir) ->
-  fetchers = {}
-  for name, file_manifest of manifest when file_manifest.hash
-    do (name, file_manifest) =>
-      fetchers[file_manifest.hash] = (async_cb) =>
-        filename = "#{dir}/#{name}"
-        mkdirp path.dirname(filename), =>
-          fetch_url "#{process.env.ANVIL_HOST}/file/#{file_manifest["hash"]}", filename, (err) ->
-            async_cb(err) if err?
-            fs.chmod filename, file_manifest.mode, (err) ->
-              async_cb(err) if err?
-              fs.utimes filename, file_manifest.mtime, file_manifest.mtime, (err) ->
-                async_cb err, true
-
-datastore_link_fetchers = (manifest, dir) ->
-  fetchers = {}
-  for name, file_manifest of manifest when file_manifest.link
-    do (name, file_manifest) =>
-      fetchers[file_manifest.link] = (async_cb) =>
-        filename = "#{dir}/#{name}"
-        mkdirp path.dirname(filename), =>
-          fs.symlink "#{dir}/#{file_manifest.link}", filename, ->
-            fs.chmod filename, file_manifest.mode, (err) ->
-              console.log "#{name} chmod completed"
-              async_cb err, true
+  if !file_manifest.link?
+    task_cb null, true
+  else
+    filename = "#{dir}/#{name}"
+    mkdirp path.dirname(filename), =>
+      fs.symlink "#{dir}/#{file_manifest.link}", filename, ->
+        fs.chmod filename, file_manifest.mode, (err) ->
+          task_cb err, true
 
 fetch_url = (url, filename, cb) ->
 
@@ -122,7 +97,7 @@ module.exports.execute = (args) ->
 
       console.log "prep_functions #{tasks.length}"
 
-      task_subset = tasks #[1..500]
+      task_subset = tasks
 
       q = async.queue( (task, cb) ->
           console.log ">> dl + link: #{task.name}"
@@ -134,18 +109,6 @@ module.exports.execute = (args) ->
 
       q.drain = ->
         console.log('all items have been processed')
-
-      #async.parallelLimit task_subset, 10, (err, results) ->
-      #  if err? then console.log err
-      #  console.log results
-      ###
-      async.parallelLimit datastore_hash_fetchers(manifest, program.args[1]), 10, (err, results) ->
-        if err?
-          console.log(err)
-        else
-          async.parallelLimit datastore_link_fetchers(manifest, program.args[1]), 10, (err, results) ->
-            if err? then console.log(err) else console.log "complete"
-      ###
 
   catch e
     console.log e

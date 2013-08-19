@@ -40,7 +40,6 @@ case $source_url in
     manifest=$(mktemp -t manifest_XXXXX)
     curl -f -Ls $source_url -o $manifest
 
-    echo "Running: download_manifest: $manifest, $compile_dir" >&2
     $root_dir/bin/download_manifest $manifest $compile_dir > .download_manifest.log
     ;;
   *.git)
