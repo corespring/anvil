@@ -55,11 +55,13 @@ datastore_link_fetchers = (manifest, dir) ->
 fetch_url = (url, filename, cb) ->
   console.log "#{filename} -> create write stream"
 
-  createStream = try
-    fs.createWriteStream filename
-  catch e
-    console.log e
-    throw "Error creating writesStream #{filename} #{e}"
+  createStream =  ->
+    try
+      fs.createWriteStream filename
+    catch e
+      console.log e
+    finally
+      cb "Error creating writesStream #{filename} #{e}"
 
   file    = createStream filename
   options = require("url").parse(url)
