@@ -27,7 +27,7 @@ datastore_hash_fetchers = (manifest, dir) ->
             async_cb(err) if err?
             fs.chmod filename, file_manifest.mode, (err) ->
               async_cb(err) if err?
-             console.log "#{filename} file fetched - utimes"
+              console.log "#{filename} file fetched - utimes"
               fs.utimes filename, file_manifest.mtime, file_manifest.mtime, (err) ->
                 async_cb err, true
 
