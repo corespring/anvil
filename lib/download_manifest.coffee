@@ -54,7 +54,14 @@ datastore_link_fetchers = (manifest, dir) ->
 
 fetch_url = (url, filename, cb) ->
   console.log "#{filename} -> create write stream"
-  file    = fs.createWriteStream filename
+
+  createStream = try
+    fs.createWriteStream filename
+  catch e
+    console.log e
+    throw "Error creating writesStream #{filename} #{e}"
+
+  file    = createStream filename
   options = require("url").parse(url)
   client  = if options.protocol is "https:" then https else http
   get     = client.request options, (res) ->
