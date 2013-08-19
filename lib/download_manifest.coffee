@@ -30,7 +30,7 @@ datastore_hash_fetchers = (manifest, dir) ->
               async_cb(err) if err?
               console.log "#{filename} file fetched - utimes"
               fs.utimes filename, file_manifest.mtime, file_manifest.mtime, (err) ->
-                console.log "#{fileame} utimes done"
+                console.log "#{filename} utimes done"
                 async_cb err, true
 
 datastore_link_fetchers = (manifest, dir) ->
