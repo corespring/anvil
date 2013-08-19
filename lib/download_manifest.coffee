@@ -15,6 +15,20 @@ program
   .version(require("#{__dirname}/../package.json").version)
   .usage('[options] <manifest> <target>')
 
+
+prepare_file = (name, file_manifest, dir) ->
+
+  acync_fn = (async_cb) =>
+    filename = "#{dir}/#{name}"
+    mkdirp path.dirname(filename), =>
+      fetch_url "#{process.env.ANVIL_HOST}/file/#{file_manifest["hash"]}", filename, (err) ->
+        fs.chmod filename, file_manifest.mode, (err) ->
+          async_cb(err) if err?
+            fs.utimes filename, file_manifest.mtime, file_manifest.mtime, (err) ->
+              async_cb err, true
+  acync_fn
+
+
 datastore_hash_fetchers = (manifest, dir) ->
   fetchers = {}
   for name, file_manifest of manifest when file_manifest.hash
@@ -97,14 +111,24 @@ module.exports.execute = (args) ->
 
     fs.readFile program.args[0], (err, data) ->
       manifest = JSON.parse(data)
-      mkdirp program.args[1]
+      base_dir = program.args[1]
+      mkdirp base_dir
 
-      async.parallelLimit datastore_hash_fetchers(manifest, program.args[1]), 80, (err, results) ->
+
+      prep_functions = []
+      for name, file_manifest of manifest
+        prep_functions.push (prepare_file(name, file_manifest, base_dir))
+
+      console.log "prep_functions #{prep_functions.length}"
+
+      ###
+      async.parallelLimit datastore_hash_fetchers(manifest, program.args[1]), 10, (err, results) ->
         if err?
           console.log(err)
         else
-          async.parallelLimit datastore_link_fetchers(manifest, program.args[1]), 80, (err, results) ->
+          async.parallelLimit datastore_link_fetchers(manifest, program.args[1]), 10, (err, results) ->
             if err? then console.log(err) else console.log "complete"
+      ###
 
   catch e
     console.log e
