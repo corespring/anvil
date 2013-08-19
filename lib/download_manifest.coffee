@@ -20,6 +20,7 @@ datastore_hash_fetchers = (manifest, dir) ->
   for name, file_manifest of manifest when file_manifest.hash
     do (name, file_manifest) =>
       fetchers[file_manifest.hash] = (async_cb) =>
+        console.log "hash fetcher for : #{name}"
         filename = "#{dir}/#{name}"
         mkdirp path.dirname(filename), =>
           fetch_url "#{process.env.ANVIL_HOST}/file/#{file_manifest["hash"]}", filename, (err) ->
@@ -29,6 +30,7 @@ datastore_hash_fetchers = (manifest, dir) ->
               async_cb(err) if err?
               console.log "#{filename} file fetched - utimes"
               fs.utimes filename, file_manifest.mtime, file_manifest.mtime, (err) ->
+                console.log "#{fileame} utimes done"
                 async_cb err, true
 
 datastore_link_fetchers = (manifest, dir) ->
@@ -36,12 +38,18 @@ datastore_link_fetchers = (manifest, dir) ->
   for name, file_manifest of manifest when file_manifest.link
     do (name, file_manifest) =>
       fetchers[file_manifest.link] = (async_cb) =>
+
+        "link fetcher for: #{name}"
+
         console.log "linking", name, file_manifest
         filename = "#{dir}/#{name}"
         mkdirp path.dirname(filename), =>
           console.log "link", filename, file_manifest.link
           fs.symlink "#{dir}/#{file_manifest.link}", filename, ->
+
+            console.log "#{name} sym link created"
             fs.chmod filename, file_manifest.mode, (err) ->
+              console.log "#{name} chmod completed"
               async_cb null, true
 
 fetch_url = (url, filename, cb) ->
@@ -75,10 +83,11 @@ module.exports.execute = (args) ->
     mkdirp program.args[1]
 
     async.parallel datastore_hash_fetchers(manifest, program.args[1]), (err, results) ->
-
+      console.log "----------- run hash fetchers"
       if err?
         console.log(err)
       else
+        console.log "_________ run link fetchers"
         async.parallel datastore_link_fetchers(manifest, program.args[1]), (err, results) ->
 
           if err? then console.log err else console.log "complete"
