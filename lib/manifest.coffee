@@ -40,7 +40,6 @@ class Manifest
     async.map @hashes(), he, (err, results) ->
       missing = []
 
-      console.log "received results : #{results}"
       for r in results
         missing.push(r.hash) unless r.exists
       cb missing
