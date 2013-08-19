@@ -26,10 +26,10 @@ prepare_file = (name, file_manifest, dir, task_cb) ->
 
 link_file = (name, file_manifest, dir, task_cb) ->
   filename = "#{dir}/#{name}"
-    mkdirp path.dirname(filename), =>
-      fs.symlink "#{dir}/#{file_manifest.link}", filename, ->
-        fs.chmod filename, file_manifest.mode, (err) ->
-          task_cb err, true
+  mkdirp path.dirname(filename), =>
+    fs.symlink "#{dir}/#{file_manifest.link}", filename, ->
+      fs.chmod filename, file_manifest.mode, (err) ->
+        task_cb err, true
 
 
 
