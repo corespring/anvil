@@ -23,7 +23,6 @@ prepare_file = (name, file_manifest, dir) ->
     mkdirp path.dirname(filename), =>
       fetch_url "#{process.env.ANVIL_HOST}/file/#{file_manifest["hash"]}", filename, (err) ->
         fs.chmod filename, file_manifest.mode, (err) ->
-          async_cb(err) if err?
             fs.utimes filename, file_manifest.mtime, file_manifest.mtime, (err) ->
               async_cb err, true
   acync_fn
