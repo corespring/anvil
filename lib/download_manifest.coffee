@@ -114,7 +114,7 @@ module.exports.execute = (args) ->
 
       console.log "prep_functions #{tasks.length}"
 
-      task_subset = tasks[1..20]
+      task_subset = tasks[1..100]
 
       q = async.queue( (task, cb) ->
           console.log ">> Run task : #{task.name}"
