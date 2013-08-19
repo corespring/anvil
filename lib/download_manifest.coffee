@@ -85,21 +85,28 @@ fetch_url = (url, filename, cb) ->
   get.end()
 
 module.exports.execute = (args) ->
-  program.parse(args)
 
-  console.log "[download manifest] execute"
+  try
+    program.parse(args)
 
-  console.log "[download manifest] args: #{args}"
-  file = program.args[0]
-  console.log "[download manifest] read file: #{file}"
+    console.log "[download manifest] args: #{args}"
 
-  fs.readFile program.args[0], (err, data) ->
-    manifest = JSON.parse(data)
-    mkdirp program.args[1]
+    file = program.args[0]
 
-    async.parallelLimit datastore_hash_fetchers(manifest, program.args[1]), 40, (err, results) ->
-      if err?
-        console.log(err)
-      else
-        async.parallelLimit datastore_link_fetchers(manifest, program.args[1]), 40, (err, results) ->
-          if err? then console.log(err) else console.log "complete"
+    console.log "[download manifest] read file: #{file}"
+
+    fs.readFile program.args[0], (err, data) ->
+      manifest = JSON.parse(data)
+      mkdirp program.args[1]
+
+      async.parallelLimit datastore_hash_fetchers(manifest, program.args[1]), 40, (err, results) ->
+        if err?
+          console.log(err)
+        else
+          async.parallelLimit datastore_link_fetchers(manifest, program.args[1]), 40, (err, results) ->
+            if err? then console.log(err) else console.log "complete"
+
+  catch e
+    console.log e
+    console.trace
+    throw "Error running execute #{e}"
