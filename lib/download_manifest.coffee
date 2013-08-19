@@ -23,9 +23,11 @@ datastore_hash_fetchers = (manifest, dir) ->
         filename = "#{dir}/#{name}"
         mkdirp path.dirname(filename), =>
           fetch_url "#{process.env.ANVIL_HOST}/file/#{file_manifest["hash"]}", filename, (err) ->
+            console.log "#{filename} file fetched - chmod"
             async_cb(err) if err?
             fs.chmod filename, file_manifest.mode, (err) ->
               async_cb(err) if err?
+             console.log "#{filename} file fetched - utimes"
               fs.utimes filename, file_manifest.mtime, file_manifest.mtime, (err) ->
                 async_cb err, true
 
@@ -47,7 +49,9 @@ fetch_url = (url, filename, cb) ->
   options = require("url").parse(url)
   client  = if options.protocol is "https:" then https else http
   get     = client.request options, (res) ->
-    res.on "data",  (chunk) -> file.write chunk
+    res.on "data",  (chunk) ->
+      console.log "#{filename} [fetch_url] data received - write"
+      file.write chunk
     res.on "end", ->
       file.end()
       cb null
