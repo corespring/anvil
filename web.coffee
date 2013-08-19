@@ -110,7 +110,6 @@ app.post "/manifest/diff", (req, res) ->
   for x of bodyManifest
     console.log "file: #{x}"
 
-  #console.log(JSON.stringify(bodyManifest))
   manifest.init(bodyManifest).missing_hashes (hashes) ->
     missing = JSON.stringify(hashes)
     res.contentType "application/json"
