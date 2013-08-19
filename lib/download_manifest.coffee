@@ -24,6 +24,14 @@ prepare_file = (name, file_manifest, dir, task_cb) ->
         fs.utimes filename, file_manifest.mtime, file_manifest.mtime, (err) ->
           task_cb err, true
 
+link_file = (name, file_manifest, dir, task_cb) ->
+  filename = "#{dir}/#{name}"
+    mkdirp path.dirname(filename), =>
+      fs.symlink "#{dir}/#{file_manifest.link}", filename, ->
+        fs.chmod filename, file_manifest.mode, (err) ->
+          task_cb err, true
+
+
 
 datastore_hash_fetchers = (manifest, dir) ->
   fetchers = {}
@@ -118,11 +126,14 @@ module.exports.execute = (args) ->
 
       q = async.queue( (task, cb) ->
           console.log ">> Run task : #{task.name}"
-          prepare_file( task.name, task.manifest, task.base_dir, cb)
+          onFilePrepped = (err, isSuccess) ->
+            link_file( task.name, task.manifest, task.base_dir, cb)
+
+          prepare_file( task.name, task.manifest, task.base_dir, onFilePrepped)
+          #link_file( task.name, task.manifest, task.base_dir, cb)
       , 50)
 
       q.push task_subset
-      #, (err) -> nullconsole.log "batch add handler"
 
       q.drain = ->
         console.log('all items have been processed')
