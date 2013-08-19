@@ -106,6 +106,8 @@ app.post "/manifest/build", (req, res) ->
 app.post "/manifest/diff", (req, res) ->
   console.log "[web.coffee] received request for diffs..."
   bodyManifest = JSON.parse(req.body.manifest)
+
+  console.log(JSON.stringify(bodyManifest))
   manifest.init(bodyManifest).missing_hashes (hashes) ->
     missing = JSON.stringify(hashes)
     res.contentType "application/json"

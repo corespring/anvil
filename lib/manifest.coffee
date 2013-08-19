@@ -49,5 +49,5 @@ class Manifest
     "#{process.env.ANVIL_HOST}/manifest/#{@id}.json"
 
 module.exports.init = (manifest) ->
-  console.log "create new manifest..."
+  console.log "[Manifest] create new manifest..."
   new Manifest(manifest)
