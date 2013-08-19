@@ -65,7 +65,8 @@ app.get "/exit/:id", (req, res) ->
 app.get "/file/:hash", (req, res) ->
   log "api.file.get", hash:req.params.hash, (logger) ->
     storage.get "/hash/#{req.params.hash}", (err, get) ->
-      res.writeHead get.statusCode,
+      sc = if get? then get.statusCode else 400
+      res.writeHead sc,
         "Content-Length": get.headers["content-length"]
       get.on "data", (chunk) -> res.write chunk
       get.on "end",          -> logger.finish(); res.end()
