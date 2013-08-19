@@ -23,9 +23,11 @@ datastore_hash_fetchers = (manifest, dir) ->
         filename = "#{dir}/#{name}"
         mkdirp path.dirname(filename), =>
           fetch_url "#{process.env.ANVIL_HOST}/file/#{file_manifest["hash"]}", filename, (err) ->
+            async_cb(err) if err?
             fs.chmod filename, file_manifest.mode, (err) ->
+              async_cb(err) if err?
               fs.utimes filename, file_manifest.mtime, file_manifest.mtime, (err) ->
-                async_cb null, true
+                async_cb err, true
 
 datastore_link_fetchers = (manifest, dir) ->
   fetchers = {}
@@ -67,6 +69,12 @@ module.exports.execute = (args) ->
   fs.readFile program.args[0], (err, data) ->
     manifest = JSON.parse(data)
     mkdirp program.args[1]
+
     async.parallel datastore_hash_fetchers(manifest, program.args[1]), (err, results) ->
-      async.parallel datastore_link_fetchers(manifest, program.args[1]), (err, results) ->
-        console.log "complete"
+
+      if err?
+        console.log(err)
+      else
+        async.parallel datastore_link_fetchers(manifest, program.args[1]), (err, results) ->
+
+          if err? then console.log err else console.log "complete"
