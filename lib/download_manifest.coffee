@@ -99,11 +99,11 @@ module.exports.execute = (args) ->
       manifest = JSON.parse(data)
       mkdirp program.args[1]
 
-      async.parallelLimit datastore_hash_fetchers(manifest, program.args[1]), 40, (err, results) ->
+      async.parallelLimit datastore_hash_fetchers(manifest, program.args[1]), 80, (err, results) ->
         if err?
           console.log(err)
         else
-          async.parallelLimit datastore_link_fetchers(manifest, program.args[1]), 40, (err, results) ->
+          async.parallelLimit datastore_link_fetchers(manifest, program.args[1]), 80, (err, results) ->
             if err? then console.log(err) else console.log "complete"
 
   catch e
