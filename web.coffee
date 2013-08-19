@@ -84,6 +84,9 @@ app.post "/file/:hash", (req, res) ->
         if err? then res.status(400).send(err) else res.send "ok"
 
 app.post "/manifest", (req, res) ->
+
+  console.log "[web.coffee] POST /manifest"
+  console.log(JSON.stringify(req.body.manifest))
   manifest.init(JSON.parse(req.body.manifest)).save (err, manifest_url) ->
     res.header "Location", manifest_url
     res.send "ok"
