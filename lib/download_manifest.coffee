@@ -122,7 +122,7 @@ module.exports.execute = (args) ->
 
       run_functions = prep_functions[1..10]
 
-      async.parallel run_functions, 50, (err, results) ->
+      async.parallel run_functions, (err, results) ->
         if err? then console.log err
         console.log results
       ###
