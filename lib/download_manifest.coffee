@@ -20,9 +20,10 @@ prepare_file = (name, file_manifest, dir, task_cb) ->
   filename = "#{dir}/#{name}"
   mkdirp path.dirname(filename), =>
     fetch_url "#{process.env.ANVIL_HOST}/file/#{file_manifest["hash"]}", filename, (err) ->
-      fs.chmod filename, file_manifest.mode, (err) ->
-          fs.utimes filename, file_manifest.mtime, file_manifest.mtime, (err) ->
-            task_cb err, true
+      task_cb err, true
+      #fs.chmod filename, file_manifest.mode, (err) ->
+      #    fs.utimes filename, file_manifest.mtime, file_manifest.mtime, (err) ->
+      #      task_cb err, true
 
 
 datastore_hash_fetchers = (manifest, dir) ->
