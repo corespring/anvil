@@ -115,15 +115,21 @@ module.exports.execute = (args) ->
       mkdirp base_dir
 
 
-      prep_functions = []
+      tasks = []
       for name, file_manifest of manifest
-        prep_functions.push (prepare_file(name, file_manifest, base_dir))
+        tasks.push ( { name: name, manifest: file_manifest, base_dir: base_dir } )
 
-      console.log "prep_functions #{prep_functions.length}"
+      console.log "prep_functions #{tasks.length}"
 
       run_functions = prep_functions[1..3]
 
-      q = async.queue(run_functions, 10)
+      q = async.queue( (task, cb) ->
+          console.log "task : #{task.name}"
+          cb()
+      , 10)
+
+      q.push run_functions, (err) ->
+        console.log "batch add handler"
 
       q.drain = ->
         console.log('all items have been processed')
