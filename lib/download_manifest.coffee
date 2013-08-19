@@ -121,8 +121,8 @@ module.exports.execute = (args) ->
           prepare_file( task.name, task.manifest, task.base_dir, cb)
       , 50)
 
-      q.push task_subset, (err) ->
-        console.log "batch add handler"
+      q.push task_subset
+      #, (err) -> nullconsole.log "batch add handler"
 
       q.drain = ->
         console.log('all items have been processed')
