@@ -121,20 +121,20 @@ module.exports.execute = (args) ->
 
       console.log "prep_functions #{tasks.length}"
 
-      run_functions = prep_functions[1..3]
+      task_subset = tasks[1..3]
 
       q = async.queue( (task, cb) ->
           console.log "task : #{task.name}"
           cb()
       , 10)
 
-      q.push run_functions, (err) ->
+      q.push task_subset, (err) ->
         console.log "batch add handler"
 
       q.drain = ->
         console.log('all items have been processed')
 
-      #async.parallelLimit run_functions, 10, (err, results) ->
+      #async.parallelLimit task_subset, 10, (err, results) ->
       #  if err? then console.log err
       #  console.log results
       ###
